@@ -1,0 +1,409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>The Friendship Tree 🌸</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background: #11091c;
+            min-height: 100vh;
+            overflow: hidden;
+            font-family: '-apple-system', BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .aura {
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(181, 23, 158, 0.15) 0%, rgba(0,0,0,0) 70%);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .garden-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            max-width: 500px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            align-items: center;
+            padding-bottom: 160px;
+            z-index: 5;
+        }
+
+        .tree-trunk {
+            position: relative;
+            width: 24px;
+            height: 220px;
+            background: linear-gradient(to top, #2b113a, #4a1c5d);
+            border-radius: 12px 12px 0 0;
+            box-shadow: 0 0 20px rgba(181, 23, 158, 0.3);
+        }
+
+        .branch {
+            position: absolute;
+            background: #4a1c5d;
+            border-radius: 10px;
+            transform-origin: bottom center;
+        }
+        .branch.left {
+            width: 12px;
+            height: 90px;
+            top: 50px;
+            left: -5px;
+            transform: rotate(-45deg);
+        }
+        .branch.right {
+            width: 12px;
+            height: 90px;
+            top: 90px;
+            left: 16px;
+            transform: rotate(45deg);
+        }
+        .branch.center {
+            width: 10px;
+            height: 70px;
+            top: -50px;
+            left: 7px;
+            transform: rotate(10deg);
+        }
+
+        .lantern {
+            position: absolute;
+            width: 55px;
+            height: 70px;
+            background: rgba(255, 255, 255, 0.06);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 24px;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+            animation: floatSwing var(--swingspeed) ease-in-out infinite alternate;
+        }
+
+        @-webkit-keyframes floatSwing {
+            0% { transform: translateY(0) rotate(-4deg); }
+            100% { transform: translateY(-12px) rotate(4deg); }
+        }
+        @keyframes floatSwing {
+            0% { transform: translateY(0) rotate(-4deg); }
+            100% { transform: translateY(-12px) rotate(4deg); }
+        }
+
+        .lantern.lit-pink {
+            background: rgba(255, 71, 126, 0.9);
+            border-color: #ff758f;
+            box-shadow: 0 0 30px #ff477e, 0 0 60px rgba(255, 71, 126, 0.5);
+            transform: scale(1.1);
+        }
+
+        .lantern.lit-purple {
+            background: rgba(181, 23, 158, 0.9);
+            border-color: #d64cdb;
+            box-shadow: 0 0 30px #b5179e, 0 0 60px rgba(181, 23, 158, 0.5);
+            transform: scale(1.1);
+        }
+
+        .story-bubble {
+            position: absolute;
+            top: 40px;
+            left: 25px;
+            right: 25px;
+            background: rgba(255, 255, 255, 0.07);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 22px;
+            border-radius: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: #f3e8ff;
+            text-align: center;
+            font-size: 15px;
+            line-height: 1.6;
+            box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+            opacity: 1;
+            transition: opacity 0.3s ease;
+        }
+
+        .story-bubble h2 {
+            font-size: 18px;
+            margin-bottom: 8px;
+            background: linear-gradient(45deg, #ff477e, #b5179e);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .bottom-ui-wrapper {
+            position: fixed;
+            bottom: 30px;
+            left: 25px;
+            right: 25px;
+            z-index: 50;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            max-width: 450px;
+            margin: 0 auto;
+        }
+
+        .progress-container {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-bottom: 15px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.4);
+        }
+
+        .progress-bar {
+            width: 0%;
+            height: 100%;
+            background: linear-gradient(90deg, #ff477e, #b5179e);
+            box-shadow: 0 0 10px #ff477e;
+            transition: width 0.5s ease;
+        }
+
+        .bloom-trigger-btn {
+            width: 100%;
+            padding: 15px;
+            font-size: 15px;
+            font-weight: 700;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            background: linear-gradient(135deg, #ff477e 0%, #b5179e 100%);
+            color: white;
+            box-shadow: 0 8px 25px rgba(181, 23, 158, 0.5);
+            opacity: 0;
+            transform: translateY(20px);
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: pulseBtn 2s infinite;
+        }
+
+        .bloom-trigger-btn.visible {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+        }
+
+        @keyframes pulseBtn {
+            0%, 100% { transform: scale(1); box-shadow: 0 8px 25px rgba(181, 23, 158, 0.5); }
+            50% { transform: scale(1.03); box-shadow: 0 12px 30px rgba(255, 71, 126, 0.7); }
+        }
+
+        .canopy-bloom {
+            position: absolute;
+            top: -140px;
+            left: -130px;
+            width: 280px;
+            height: 220px;
+            background: radial-gradient(circle, rgba(255,71,126,0.85) 0%, rgba(181,23,158,0.7) 60%, rgba(0,0,0,0) 100%);
+            filter: blur(15px);
+            border-radius: 50%;
+            opacity: 0;
+            transform: scale(0.5);
+            transition: all 2.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .canopy-bloom.bloomed {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .glow-sparkle {
+            position: absolute;
+            pointer-events: none;
+            user-select: none;
+            z-index: 2;
+            text-shadow: 0 0 10px rgba(255, 255, 255, 1);
+            animation: ascend var(--duration) linear forwards;
+        }
+
+        @keyframes ascend {
+            0% {
+                transform: translate(0, 0) scale(0.3) rotate(0deg);
+                opacity: 0;
+            }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% {
+                transform: translate(var(--drift), -105vh) scale(var(--targetscale)) rotate(360deg);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="aura"></div>
+
+    <div class="garden-container">
+        
+        <div class="story-bubble" id="narrative-box">
+            <h2 id="story-title">The Friendship Garden ✨</h2>
+            <div id="story-text">
+                I wanted to build something meaningful instead of a basic message card. There are 3 unlit memory lanterns hanging from this tree. Tap them one by one...
+            </div>
+        </div>
+
+        <div class="tree-trunk">
+            <div class="canopy-bloom" id="canopy"></div>
+            
+            <div class="branch left">
+                <div class="lantern" id="lantern1" style="bottom: 70px; left: -30px; --swingspeed: 2.5s;" onclick="igniteLantern(1, 'pink', this)">🏮</div>
+            </div>
+            
+            <div class="branch right">
+                <div class="lantern" id="lantern2" style="bottom: 70px; right: -30px; --swingspeed: 1.9s;" onclick="igniteLantern(2, 'purple', this)">🏮</div>
+            </div>
+            
+            <div class="branch center">
+                <div class="lantern" id="lantern3" style="bottom: 50px; left: -20px; --swingspeed: 2.2s;" onclick="igniteLantern(3, 'pink', this)">🏮</div>
+            </div>
+        </div>
+
+    </div>
+
+    <div class="bottom-ui-wrapper">
+        <div class="progress-container">
+            <div class="progress-bar" id="p-bar"></div>
+        </div>
+        <button class="bloom-trigger-btn" id="bloom-btn" onclick="triggerBlossomBloom()">Bring the Garden to Life ✨</button>
+    </div>
+
+    <script>
+        let litCount = 0;
+        const trackingList = { 1: false, 2: false, 3: false };
+
+        const insights = [
+            "I feel terrible about the misunderstanding in the group chat earlier. We were laughing purely at how broken and chaotic the automatic Hindi translation got—never ever at you directly.",
+            "I truly value your presence and our conversations. I'd never want to cause real discomfort or make you feel sidelined. Your friendship is incredibly important to me.",
+            "Thank you for taking the time to open these. I promise to be a lot more thoughtful moving forward. Let's clear the air completely! Salamat for being awesome! 🇵🇭🇮🇳"
+        ];
+
+        const titles = [
+            "Lantern of Truth 🌸",
+            "Lantern of Value 🔮",
+            "Lantern of Peace 💝"
+        ];
+
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playChime(frequency) {
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            gain.gain.setValueAtTime(0.12, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.8);
+            osc.start();
+            osc.stop(audioCtx.currentTime + 0.8);
+        }
+
+        function createSparkles(startX, startY, rawCount, elementsArray) {
+            for (let i = 0; i < rawCount; i++) {
+                const sp = document.createElement('div');
+                sp.classList.add('glow-sparkle');
+                sp.innerText = elementsArray[Math.floor(Math.random() * elementsArray.length)];
+                
+                sp.style.left = `${startX}px`;
+                sp.style.top = `${startY}px`;
+                
+                sp.style.setProperty('--drift', `${Math.random() * 360 - 180}px`);
+                sp.style.setProperty('--duration', `${Math.random() * 3 + 2.5}s`);
+                sp.style.setProperty('--targetscale', Math.random() * 1.3 + 0.7);
+                sp.style.fontSize = `${Math.random() * 12 + 20}px`;
+                
+                document.body.appendChild(sp);
+                setTimeout(() => sp.remove(), 5500);
+            }
+        }
+
+        function igniteLantern(id, visualStyle, element) {
+            // Safely swap messages if clicked again without breaking anything
+            if (trackingList[id]) {
+                document.getElementById('narrative-box').style.opacity = 0;
+                setTimeout(() => {
+                    document.getElementById('story-title').innerText = titles[id - 1];
+                    document.getElementById('story-text').innerHTML = insights[id - 1];
+                    document.getElementById('narrative-box').style.opacity = 1;
+                }, 250);
+                return; 
+            }
+            
+            trackingList[id] = true;
+            litCount++;
+
+            element.innerText = "✨";
+            element.classList.add(`lit-${visualStyle}`);
+            
+            playChime(350 + (litCount * 120));
+
+            const rect = element.getBoundingClientRect();
+            createSparkles(rect.left + 25, rect.top + 20, 15, ['✨', '🌸', '🔮']);
+
+            const calculatedPercent = (litCount / 3) * 100;
+            document.getElementById('p-bar').style.width = `${calculatedPercent}%`;
+
+            document.getElementById('narrative-box').style.opacity = 0;
+            
+            setTimeout(() => {
+                document.getElementById('story-title').innerText = titles[id - 1];
+                document.getElementById('story-text').innerHTML = insights[id - 1];
+                document.getElementById('narrative-box').style.opacity = 1;
+                
+                if (litCount === 3) {
+                    document.getElementById('bloom-btn').classList.add('visible');
+                }
+            }, 300);
+        }
+
+        function triggerBlossomBloom() {
+            playChime(783.99);
+            
+            document.getElementById('canopy').classList.add('bloomed');
+            document.getElementById('bloom-btn').classList.remove('visible');
+            document.getElementById('p-bar').parentElement.style.display = 'none';
+            
+            document.getElementById('narrative-box').style.opacity = 0;
+            setTimeout(() => {
+                document.getElementById('narrative-box').innerHTML = `
+                    <h2>The Garden Has Bloomed! 🌸✨</h2>
+                    <p style="color:#f3e8ff; margin:0; font-size:14px;">The air is clear and the friendship tree is fully alive. Thank you for reading everything through! 💖🔮</p>
+                `;
+                document.getElementById('narrative-box').style.opacity = 1;
+            }, 300);
+
+            setInterval(() => {
+                createSparkles(Math.random() * window.innerWidth, window.innerHeight + 10, 1, ['💖', '💜', '🌸', '✨', '💕', '🔮']);
+            }, 100);
+        }
+    </script>
+</body>
+</html>
